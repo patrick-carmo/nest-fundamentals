@@ -13,6 +13,7 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePutUserDTO } from './dto/update-put-user.dto';
 import { UpdatePatchUserDTO } from './dto/update-patch-user.dto copy';
 import { UserService } from './user.service';
+import { ParamId } from 'src/decorators/param-id.decorator';
 
 @Controller('user')
 export class UserController {
@@ -29,28 +30,22 @@ export class UserController {
   }
 
   @Get(':id')
-  async show(@Param('id', ParseIntPipe) id: number) {
+  async show(@ParamId() id: number) {
     return this.userService.show(id);
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdatePutUserDTO,
-  ) {
+  async update(@ParamId() id: number, @Body() body: UpdatePutUserDTO) {
     return this.userService.update(id, body);
   }
 
   @Patch(':id')
-  async updatePartial(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdatePatchUserDTO,
-  ) {
+  async updatePartial(@ParamId() id: number, @Body() body: UpdatePatchUserDTO) {
     return this.userService.updatePartial(id, body);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@ParamId() id: number) {
     return this.userService.delete(id);
   }
 }
