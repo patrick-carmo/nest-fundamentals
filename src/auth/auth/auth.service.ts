@@ -21,7 +21,7 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async createToken(user: User) {
+  createToken(user: User) {
     return {
       accessToken: this.JWTService.sign(
         {
@@ -39,7 +39,7 @@ export class AuthService {
     };
   }
 
-  async checkToken(token: string) {
+  checkToken(token: string) {
     try {
       return this.JWTService.verify(token, {
         issuer: this.issuer,
@@ -50,9 +50,9 @@ export class AuthService {
     }
   }
 
-  async isValidToken(token: string) {
+  isValidToken(token: string) {
     try {
-      await this.checkToken(token);
+      this.checkToken(token);
       return true;
     } catch (e) {
       return false;
