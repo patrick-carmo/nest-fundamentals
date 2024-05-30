@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePatchUserDTO } from './dto/update-patch-user.dto copy';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
       data: {
         email,
         name,
-        password,
+        password: await hash(password, 10),
       },
     });
   }
@@ -34,7 +35,7 @@ export class UserService {
 
   async update(
     id: number,
-    { email, name, password, birthAt }: UpdatePutUserDTO,
+    { email, name, password, birthAt, role }: UpdatePutUserDTO,
   ) {
     await this.exists(id);
 
@@ -45,15 +46,16 @@ export class UserService {
       data: {
         email,
         name,
-        password,
+        password: await hash(password, 10),
         birthAt: birthAt ? new Date(birthAt) : null,
+        role,
       },
     });
   }
 
   async updatePartial(
     id: number,
-    { email, name, password, birthAt }: Partial<UpdatePatchUserDTO>,
+    { email, name, password, birthAt, role }: Partial<UpdatePatchUserDTO>,
   ) {
     await this.exists(id);
 
@@ -61,7 +63,8 @@ export class UserService {
     if (birthAt) data.birthAt = new Date(birthAt);
     if (email) data.email = email;
     if (name) data.name = name;
-    if (password) data.password = password;
+    if (password) data.password = await hash(password, 10);
+    if (role) data.role = role;
 
     return this.prisma.user.update({
       where: {

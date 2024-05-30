@@ -1,4 +1,3 @@
-import { timeout } from 'rxjs';
 import { User } from '@prisma/client';
 import {
   BadRequestException,
@@ -9,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from 'src/user/user.service';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -63,13 +63,15 @@ export class AuthService {
     const user = await this.prismaService.user.findFirst({
       where: {
         email,
-        password,
       },
     });
 
-    if (!user) {
+    if (!user) throw new UnauthorizedException('Email e/ou senha inválidos');
+
+    const passwordMatch = await compare(password, user.password);
+
+    if (!passwordMatch)
       throw new UnauthorizedException('Email e/ou senha inválidos');
-    }
 
     return this.createToken(user);
   }
