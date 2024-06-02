@@ -17,7 +17,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('user')

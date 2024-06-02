@@ -8,7 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from 'src/user/user.service';
-import { compare } from 'bcrypt';
+import { compare, hash, genSalt } from 'bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private readonly JWTService: JwtService,
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
+    private readonly mailer: MailerService,
   ) {}
 
   createToken(user: User) {
@@ -93,24 +95,54 @@ export class AuthService {
       throw new UnauthorizedException('E-mail incorreto');
     }
 
-    //To DO: Enviar o e-mail...
+    const token = this.JWTService.sign(
+      {
+        id: user.id,
+      },
+      {
+        expiresIn: '30 minutes',
+        subject: String(user.id),
+        issuer: 'forget',
+        audience: 'users',
+      },
+    );
+
+    await this.mailer.sendMail({
+      subject: 'Recuperação de senha',
+      to: email,
+      template: 'forget',
+      context: {
+        name: user.name,
+        token,
+      },
+    });
 
     return true;
   }
   async reset(password: string, token: string) {
-    //TO DO: Verificar se o token é válido
+    try {
+      const data = this.JWTService.verify(token, {
+        issuer: 'forget',
+        audience: 'users',
+      }) as { id: number };
 
-    const id = 0; //TO DO: Pegar o ID do usuário pelo token
+      const { id } = data;
 
-    const user = await this.prismaService.user.update({
-      where: {
-        id,
-      },
-      data: {
-        password,
-      },
-    });
+      const salt = await genSalt();
+      password = await hash(password, salt);
 
-    return this.createToken(user);
+      const user = await this.prismaService.user.update({
+        where: {
+          id,
+        },
+        data: {
+          password,
+        },
+      });
+
+      return this.createToken(user);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 }

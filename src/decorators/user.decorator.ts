@@ -9,9 +9,8 @@ export const User = createParamDecorator(
     const request = context.switchToHttp().getRequest();
 
     if (request.user) {
-      if (filter) {
-        return request.user[filter];
-      }
+      if (filter) return request.user[filter];
+
       return request.user;
     } else
       throw new NotFoundException(
