@@ -1,15 +1,16 @@
-import { User } from '@prisma/client';
 import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from 'src/user/user.service';
 import { compare, hash, genSalt } from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
+import { User } from 'src/user/entity/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +19,10 @@ export class AuthService {
 
   constructor(
     private readonly JWTService: JwtService,
-    private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly mailer: MailerService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   createToken(user: User) {
@@ -62,18 +64,17 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        email,
-      },
-    });
+    const user = await this.userRepository.findOneBy({ email });
 
-    if (!user) throw new UnauthorizedException('Email e/ou senha inválidos');
+    if (!user) {
+      throw new UnauthorizedException('Email e/ou senha inválidos');
+    }
 
     const passwordMatch = await compare(password, user.password);
 
-    if (!passwordMatch)
+    if (!passwordMatch) {
       throw new UnauthorizedException('Email e/ou senha inválidos');
+    }
 
     return this.createToken(user);
   }
@@ -85,16 +86,11 @@ export class AuthService {
   }
 
   async forget(email: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        email,
-      },
-    });
+    const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
       throw new UnauthorizedException('E-mail incorreto');
     }
-
     const token = this.JWTService.sign(
       {
         id: user.id,
@@ -106,7 +102,6 @@ export class AuthService {
         audience: 'users',
       },
     );
-
     await this.mailer.sendMail({
       subject: 'Recuperação de senha',
       to: email,
@@ -116,7 +111,6 @@ export class AuthService {
         token,
       },
     });
-
     return true;
   }
   async reset(password: string, token: string) {
@@ -131,14 +125,9 @@ export class AuthService {
       const salt = await genSalt();
       password = await hash(password, salt);
 
-      const user = await this.prismaService.user.update({
-        where: {
-          id,
-        },
-        data: {
-          password,
-        },
-      });
+      await this.userRepository.update(id, { password });
+
+      const user = await this.userService.show(id);
 
       return this.createToken(user);
     } catch (e) {
