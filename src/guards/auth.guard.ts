@@ -1,5 +1,5 @@
 import { UserService } from 'src/user/user.service';
-import { AuthService } from './../auth/auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 @Injectable()

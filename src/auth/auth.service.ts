@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { compare, hash, genSalt } from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from 'src/user/entity/user.entity';
+import { User } from '../user/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
