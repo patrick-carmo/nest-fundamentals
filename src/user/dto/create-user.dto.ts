@@ -33,9 +33,9 @@ export class CreateUserDTO {
 
   @IsOptional()
   @IsDateString({}, { message: 'Data de nascimento inválida.' })
-  birthAt: string;
+  birthAt?: string;
 
   @IsOptional()
   @IsEnum(Role)
-  role: number;
+  role?: number;
 }
