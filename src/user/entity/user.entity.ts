@@ -10,7 +10,7 @@ import {
 @Entity({
   name: 'users',
 })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn({
     unsigned: true,
   })

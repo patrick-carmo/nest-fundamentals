@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { userRepositoryMock } from '../testing/user/user-repository.mock';
 import { jwtServiceMock } from '../testing/auth/jwt-service.mock';
-import { userServiceMock } from '../testing/auth/user-service.mock';
+import { userServiceMock } from '../testing/user/user-service.mock';
 import { mailerServiceMock } from '../testing/auth/mailer-service.mock';
 import { userEntityList } from '../testing/user/user-entity-list.mock';
 import { accessToken } from '../testing/auth/token.mock';
@@ -62,7 +62,7 @@ describe('AuthService', () => {
     test('forget method', async () => {
       const result = await authService.forget('ptemy5@gmail.com');
 
-      expect(result).toEqual(true);
+      expect(result).toEqual({ success: true });
     });
 
     test('reset method', async () => {

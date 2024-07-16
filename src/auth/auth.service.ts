@@ -8,7 +8,7 @@ import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from '../user/user.service';
 import { compare, hash, genSalt } from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from '../user/entity/user.entity';
+import { UserEntity } from '../user/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -21,11 +21,11 @@ export class AuthService {
     private readonly JWTService: JwtService,
     private readonly userService: UserService,
     private readonly mailer: MailerService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  createToken(user: User) {
+  createToken(user: UserEntity) {
     return {
       accessToken: this.JWTService.sign(
         {
@@ -114,7 +114,7 @@ export class AuthService {
         token,
       },
     });
-    return true;
+    return { success: true };
   }
   async reset(password: string, token: string) {
     try {

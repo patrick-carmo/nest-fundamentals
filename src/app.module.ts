@@ -9,7 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entity/user.entity';
+import { UserEntity } from './user/entity/user.entity';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ import { User } from './user/entity/user.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [User],
+      entities: [UserEntity],
       synchronize: process.env.ENV === 'development',
     }),
   ],

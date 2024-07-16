@@ -6,7 +6,6 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
-  Req,
   UploadedFile,
   UploadedFiles,
   UseGuards,
@@ -17,15 +16,16 @@ import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
 import { AuthResetDTO } from './dto/auth-reset.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { User } from 'src/decorators/user.decorator';
+import { AuthGuard } from '../guards/auth.guard';
+import { User } from '../decorators/user.decorator';
 import {
   FileFieldsInterceptor,
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
-import { FileService } from 'src/file/file.service';
+import { FileService } from '../file/file.service';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -56,8 +56,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('me')
-  async me(@User() user, @Req() { tokenPayload }) {
-    return { user, tokenPayload };
+  async me(@User() user: UserEntity) {
+    return user;
   }
 
   @UseInterceptors(FileInterceptor('file'))
@@ -73,23 +73,17 @@ export class AuthController {
         ],
       }),
     )
-    @UploadedFile('file')
     photo: Express.Multer.File,
   ) {
-    const path = join(
-      process.env.PATH_DATA,
-      'photos',
-      `photo-${user.id}.${photo.mimetype.split('/')[1]}`,
-    );
+    const filename = `photo-${user.id}.jpg`;
 
     try {
-      await mkdir(join(process.env.PATH_DATA, 'photos'), { recursive: true });
-      await this.fileService.uploadFile(path, photo);
-
-      return { sucess: true };
+      await this.fileService.uploadFile(filename, photo);
     } catch (e) {
       throw new BadRequestException(e);
     }
+
+    return { photo };
   }
 
   @UseInterceptors(

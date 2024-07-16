@@ -1,9 +1,9 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../../user/entity/user.entity';
+import { UserEntity } from '../../user/entity/user.entity';
 import { userEntityList } from './user-entity-list.mock';
 
 export const userRepositoryMock = {
-  provide: getRepositoryToken(User),
+  provide: getRepositoryToken(UserEntity),
   useValue: {
     exists: jest.fn().mockResolvedValue(true),
     create: jest.fn().mockResolvedValue(userEntityList[0]),

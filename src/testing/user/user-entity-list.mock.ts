@@ -1,7 +1,7 @@
 import { Role } from '../../enums/role.enum';
-import { User } from '../../user/entity/user.entity';
+import { UserEntity } from '../../user/entity/user.entity';
 
-export const userEntityList: User[] = [
+export const userEntityList: UserEntity[] = [
   {
     id: 1,
     email: 'ptemy5@gmail.com',

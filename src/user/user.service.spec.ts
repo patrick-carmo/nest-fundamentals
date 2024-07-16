@@ -4,14 +4,14 @@ import { UserService } from './user.service';
 import { userEntityList } from '../testing/user/user-entity-list.mock';
 import { createUserDTO } from '../testing/user/create-user-dto.mock';
 import { Repository } from 'typeorm';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { updatePutUserDTO } from '../testing/user/update-put-user-dto.mock';
 import { updatePatchUserDTO } from '../testing/user/update-patch-user-dto.mock';
 
 describe('UserService', () => {
   let userService: UserService;
-  let userRepository: Repository<User>;
+  let userRepository: Repository<UserEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('UserService', () => {
     }).compile();
 
     userService = module.get<UserService>(UserService);
-    userRepository = module.get(getRepositoryToken(User));
+    userRepository = module.get(getRepositoryToken(UserEntity));
   });
 
   test('Validar a definição', () => {

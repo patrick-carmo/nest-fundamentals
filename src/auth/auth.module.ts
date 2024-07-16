@@ -2,10 +2,10 @@ import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserModule } from 'src/user/user.module';
-import { FileModule } from 'src/file/file.module';
+import { UserModule } from '../user/user.module';
+import { FileModule } from '../file/file.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/user/entity/user.entity';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { User } from 'src/user/entity/user.entity';
     }),
     forwardRef(() => UserModule),
     FileModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UserEntity]),
   ],
   controllers: [AuthController],
   providers: [AuthService],
